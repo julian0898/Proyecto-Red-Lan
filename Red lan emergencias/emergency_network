@@ -1,0 +1,4 @@
+graph {
+	bgcolor="#f8f9fa" nodesep=1.2 rankdir=LR ranksep=1.2 size="10,7"
+	node [color="#222f3e" fixedsize=true fontname="Segoe UI" fontsize=14 height=0.5 shape=circle style=filled width=0.5]
+}
