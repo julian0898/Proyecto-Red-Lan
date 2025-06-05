@@ -7,9 +7,7 @@ from enum import Enum
 import json
 from tkinter import simpledialog, messagebox
 
-# Importar el sistema de routing (asumiendo que está en el mismo directorio)
-# from routing import RoutingSystem
-
+# --- Definición de tipos de emergencia y prioridad ---
 class EmergencyType(Enum):
     INCENDIO = "incendio"
     ACCIDENTE = "accidente"
@@ -25,6 +23,7 @@ class Priority(Enum):
     ALTA = 3
     CRITICA = 4
 
+# --- Clase que representa una emergencia individual ---
 @dataclass
 class Emergency:
     id: str
@@ -37,17 +36,19 @@ class Emergency:
     response_time: Optional[int] = None
     resources_assigned: List[str] = field(default_factory=list)
     resolution_time: Optional[datetime] = None
-    
+
     def get_priority(self) -> int:
+        # Devuelve el valor numérico de la prioridad
         return self.priority.value
-    
+
     def get_duration_minutes(self) -> int:
-        """Calcular duración en minutos desde que se reportó"""
+        """Calcula la duración en minutos desde que se reportó la emergencia"""
         if self.resolution_time:
             return int((self.resolution_time - self.timestamp).total_seconds() / 60)
         return int((datetime.now() - self.timestamp).total_seconds() / 60)
-    
+
     def to_dict(self) -> Dict:
+        # Convierte la emergencia a un diccionario para exportar o mostrar
         return {
             "id": self.id,
             "type": self.emergency_type.value,
@@ -61,8 +62,10 @@ class Emergency:
             "duration_minutes": self.get_duration_minutes()
         }
 
+# --- Generador de emergencias aleatorias y escenarios realistas ---
 class EmergencyGenerator:
     def __init__(self):
+        # Plantillas de descripciones por tipo de emergencia
         self.emergency_templates = {
             EmergencyType.INCENDIO: [
                 "Incendio estructural en edificio residencial",
@@ -114,14 +117,13 @@ class EmergencyGenerator:
                 "Vandalismo en transporte público"
             ]
         }
-        
+        # Pesos para prioridad y ubicación (probabilidad de ocurrencia)
         self.priority_weights = {
             Priority.BAJA: 0.3,
             Priority.MEDIA: 0.4,
             Priority.ALTA: 0.2,
             Priority.CRITICA: 0.1
         }
-        
         self.location_weights = {
             "centro": 0.15,
             "zona_rosa": 0.12,
@@ -139,36 +141,36 @@ class EmergencyGenerator:
             "fontibon": 0.03,
             "ciudad_bolivar": 0.03
         }
-    
+
     def generate_emergency(self, emergency_id: str = None) -> Emergency:
-        """Generar una emergencia aleatoria"""
+        """Genera una emergencia aleatoria"""
         if not emergency_id:
             emergency_id = f"E{random.randint(1000, 9999)}"
-        
+
         # Seleccionar tipo de emergencia con pesos diferentes
         emergency_type = random.choices(
             list(EmergencyType),
             weights=[0.2, 0.25, 0.15, 0.1, 0.05, 0.15, 0.1]
         )[0]
-        
+
         # Seleccionar descripción
         description = random.choice(self.emergency_templates[emergency_type])
-        
+
         # Seleccionar ubicación con pesos
         location = random.choices(
             list(self.location_weights.keys()),
             weights=list(self.location_weights.values())
         )[0]
-        
+
         # Seleccionar prioridad
         priority = random.choices(
             list(Priority),
             weights=list(self.priority_weights.values())
         )[0]
-        
+
         # Timestamp aleatorio en las últimas 2 horas
         timestamp = datetime.now() - timedelta(minutes=random.randint(0, 120))
-        
+
         return Emergency(
             id=emergency_id,
             emergency_type=emergency_type,
@@ -177,32 +179,33 @@ class EmergencyGenerator:
             priority=priority,
             timestamp=timestamp
         )
-    
+
     def generate_emergency_batch(self, count: int) -> List[Emergency]:
-        """Generar múltiples emergencias"""
+        """Genera múltiples emergencias aleatorias"""
         return [self.generate_emergency() for _ in range(count)]
-    
+
     def generate_realistic_scenario(self, duration_hours: int = 1) -> List[Emergency]:
-        """Generar escenario realista de emergencias"""
+        """Genera un escenario realista de emergencias distribuidas en el tiempo"""
         emergencies = []
         start_time = datetime.now() - timedelta(hours=duration_hours)
-        
+
         # Generar entre 5-15 emergencias por hora
         total_emergencies = random.randint(5 * duration_hours, 15 * duration_hours)
-        
+
         for i in range(total_emergencies):
             # Distribuir emergencias a lo largo del tiempo
             minutes_offset = random.randint(0, duration_hours * 60)
             timestamp = start_time + timedelta(minutes=minutes_offset)
-            
+
             emergency = self.generate_emergency(f"E{1000 + i}")
             emergency.timestamp = timestamp
             emergencies.append(emergency)
-        
+
         # Ordenar por timestamp
         emergencies.sort(key=lambda x: x.timestamp)
         return emergencies
 
+# --- Simulador principal de emergencias ---
 class EmergencySimulator:
     def __init__(self, routing_system=None):
         self.generator = EmergencyGenerator()
@@ -215,24 +218,22 @@ class EmergencySimulator:
             "resolution_rate": 0,
             "resource_efficiency": {}
         }
-        
-        # Recursos disponibles (simulados)
+        # Recursos disponibles simulados
         self.available_resources = {
             "bomberos": ["B1", "B2", "B3", "B4", "B5"],
             "ambulancia": ["A1", "A2", "A3", "A4"],
             "policia": ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"]
         }
-        
-        self.resource_assignments = {}  # Recursos asignados actualmente
-    
+        self.resource_assignments = {}  # Recursos actualmente asignados
+
     def add_emergency(self, emergency: Emergency):
-        """Agregar emergencia al simulador"""
+        """Agrega una emergencia al simulador"""
         self.active_emergencies.append(emergency)
         self.simulation_stats["total_emergencies"] += 1
         print(f"🚨 Nueva emergencia: {emergency.id} - {emergency.emergency_type.value} en {emergency.location}")
-    
+
     def assign_resources(self, emergency):
-        """Asignar recursos a una emergencia"""
+        """Asigna recursos a una emergencia según su tipo"""
         resource_requirements = {
             "incendio": ["bomberos", "ambulancia"],
             "accidente": ["ambulancia", "policia"],
@@ -260,53 +261,53 @@ class EmergencySimulator:
                 "resource_id": resource_type.upper() + str(random.randint(1, 9))
             }
         return assignment_result
-    
+
     def resolve_emergency(self, emergency_id: str, resolution_time: datetime = None) -> bool:
-        """Resolver una emergencia y liberar recursos"""
+        """Marca una emergencia como resuelta y libera recursos"""
         emergency = self.find_emergency_by_id(emergency_id)
         if not emergency:
             return False
-        
+
         if not resolution_time:
             resolution_time = datetime.now()
-        
+
         emergency.status = "resolved"
         emergency.resolution_time = resolution_time
-        
+
         # Liberar recursos asignados
         for resource_id in emergency.resources_assigned:
             if resource_id in self.resource_assignments:
                 del self.resource_assignments[resource_id]
-        
+
         # Mover a emergencias resueltas
         self.active_emergencies.remove(emergency)
         self.resolved_emergencies.append(emergency)
-        
+
         print(f"✅ Emergencia {emergency_id} resuelta - Duración: {emergency.get_duration_minutes()} min")
         return True
-    
+
     def find_emergency_by_id(self, emergency_id: str) -> Optional[Emergency]:
-        """Encontrar emergencia por ID"""
+        """Busca una emergencia activa por su ID"""
         for emergency in self.active_emergencies:
             if emergency.id == emergency_id:
                 return emergency
         return None
-    
+
     def simulate_time_progression(self, minutes: int = 60):
-        """Simular progresión del tiempo y resolver emergencias automáticamente"""
+        """Simula la progresión del tiempo y resuelve emergencias automáticamente"""
         print(f"\n🕐 Simulando {minutes} minutos de operación...")
-        
+
         start_time = datetime.now()
-        
+
         for minute in range(minutes):
             current_time = start_time + timedelta(minutes=minute)
-            
+
             # Resolver algunas emergencias aleatoriamente
             if self.active_emergencies and random.random() < 0.1:  # 10% chance cada minuto
                 emergency_to_resolve = random.choice(self.active_emergencies)
                 if emergency_to_resolve.get_duration_minutes() > 15:  # Resolver si ha durado más de 15 min
                     self.resolve_emergency(emergency_to_resolve.id, current_time)
-            
+
             # Generar nuevas emergencias ocasionalmente
             if random.random() < 0.05:  # 5% chance cada minuto
                 new_emergency = self.generator.generate_emergency()
@@ -314,46 +315,46 @@ class EmergencySimulator:
                 self.add_emergency(new_emergency)
                 if self.routing_system:
                     self.assign_resources(new_emergency)
-        
+
         print(f"✅ Simulación completada")
-    
+
     def run_scenario(self, scenario_name: str = "normal") -> Dict:
-        """Ejecutar escenario predefinido"""
+        """Ejecuta un escenario predefinido de simulación"""
         print(f"\n🎯 EJECUTANDO ESCENARIO: {scenario_name.upper()}")
         print("=" * 50)
-        
+
         scenarios = {
             "normal": {"emergencies": 8, "duration": 2},
             "crisis": {"emergencies": 15, "duration": 1},
             "quiet": {"emergencies": 3, "duration": 3}
         }
-        
+
         scenario_config = scenarios.get(scenario_name, scenarios["normal"])
-        
+
         # Generar emergencias iniciales
         initial_emergencies = self.generator.generate_realistic_scenario(
             scenario_config["duration"]
         )
-        
+
         print(f"📊 Generadas {len(initial_emergencies)} emergencias")
-        
+
         # Procesar emergencias
         for emergency in initial_emergencies[:scenario_config["emergencies"]]:
             self.add_emergency(emergency)
             if self.routing_system:
                 self.assign_resources(emergency)
-        
+
         # Simular progresión
         self.simulate_time_progression(scenario_config["duration"] * 60)
-        
+
         # Generar reporte
         return self.generate_report()
-    
+
     def generate_report(self) -> Dict:
-        """Generar reporte de simulación"""
+        """Genera un reporte con estadísticas de la simulación"""
         total_emergencies = len(self.active_emergencies) + len(self.resolved_emergencies)
         resolved_count = len(self.resolved_emergencias)
-        
+
         # Calcular estadísticas
         avg_response_time = 0
         if self.resolved_emergencias:
@@ -362,13 +363,13 @@ class EmergencySimulator:
                 if e.response_time
             )
             avg_response_time = total_response_time / len(self.resolved_emergencias)
-        
+
         resolution_rate = (resolved_count / total_emergencies * 100) if total_emergencies > 0 else 0
-        
+
         # Estadísticas por tipo de emergencia
         emergency_types_stats = {}
         all_emergencies = self.active_emergencies + self.resolved_emergencias
-        
+
         for emergency_type in EmergencyType:
             emergencies_of_type = [e for e in all_emergencies if e.emergency_type == emergency_type]
             resolved_of_type = [e for e in emergencies_of_type if e.status == "resolved"]
@@ -407,9 +408,9 @@ class EmergencySimulator:
         }
         
         return report
-    
+
     def print_status(self):
-        """Imprimir estado actual del simulador"""
+        """Imprime el estado actual del simulador en consola"""
         print(f"\n📊 ESTADO ACTUAL DEL SIMULADOR")
         print(f"Emergencias activas: {len(self.active_emergencies)}")
         print(f"Emergencias resueltas: {len(self.resolved_emergencias)}")
@@ -420,9 +421,9 @@ class EmergencySimulator:
             for emergency in self.active_emergencies:
                 duration = emergency.get_duration_minutes()
                 print(f"  {emergency.id}: {emergency.emergency_type.value} en {emergency.location} ({duration} min)")
-    
+
     def export_results(self, filename: str = "simulation_results.json"):
-        """Exportar resultados a archivo JSON"""
+        """Exporta los resultados de la simulación a un archivo JSON"""
         report = self.generate_report()
         try:
             with open(filename, 'w', encoding='utf-8') as f:
@@ -430,9 +431,9 @@ class EmergencySimulator:
             print(f"📄 Resultados exportados a {filename}")
         except Exception as e:
             print(f"❌ Error al exportar: {e}")
-    
+
     def get_performance_metrics(self) -> Dict:
-        """Obtener métricas de rendimiento"""
+        """Obtiene métricas de rendimiento de la simulación"""
         if not self.resolved_emergencias:
             return {"error": "No hay emergencias resueltas para analizar"}
         
@@ -468,8 +469,9 @@ class EmergencySimulator:
         
         return metrics
 
+# --- Función para ejecutar una simulación completa de ejemplo ---
 def run_complete_simulation():
-    """Función principal para ejecutar simulación completa"""
+    """Ejecuta una demo completa de simulación de emergencias"""
     print("🚨 SIMULADOR DE EMERGENCIAS - DEMO COMPLETO")
     print("=" * 60)
     
@@ -505,9 +507,9 @@ def run_complete_simulation():
     print(f"\n✅ Simulación completa finalizada")
     return simulator
 
-# Función de prueba
+# --- Función de prueba básica del sistema ---
 def test_emergency_system():
-    """Prueba básica del sistema"""
+    """Prueba básica del sistema de emergencias"""
     print("🧪 PRUEBA DEL SISTEMA DE EMERGENCIAS")
     print("=" * 40)
     
@@ -530,6 +532,7 @@ def test_emergency_system():
     
     print(f"\n✅ Prueba completada exitosamente")
 
+# --- Función para agregar una emergencia desde la interfaz gráfica ---
 def agregar_emergencia():
     location = simpledialog.askstring("Ubicación", "Ubicación:")
     if not location: return
@@ -547,10 +550,9 @@ def agregar_emergencia():
                                  f"Estaciones notificadas: {', '.join(estaciones_afectadas)}")
     mostrar_asignacion(asignacion, emergency_type)
 
+# --- Ejecución directa del simulador si se ejecuta este archivo ---
 if __name__ == "__main__":
-    # Ejecutar demo completo
     run_complete_simulation()
-    
     print(f"\n" + "="*60)
     print("Para usar con el sistema de routing, importa RoutingSystem:")
     print("from routing import RoutingSystem")

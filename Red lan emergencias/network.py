@@ -1,28 +1,24 @@
 # network.py
+
 from collections import defaultdict
-import shutil
 
-# Importar graphviz solo si está disponible
-try:
-    import graphviz
-except ImportError:
-    graphviz = None
-
+# Clase que representa la red de estaciones y sus conexiones
 class Network:
     def __init__(self):
+        # Inicializa el grafo, el conjunto de nodos y las estadísticas de tráfico
         self.graph = defaultdict(list)
         self.nodes = set()
         self.stats = defaultdict(int)  # Para estadísticas de tráfico
-    
+
     def add_connection(self, u, v, weight):
-        """Agregar conexión bidireccional entre nodos"""
+        """Agrega una conexión bidireccional entre los nodos u y v con peso 'weight'."""
         self.graph[u].append((v, weight))
         self.graph[v].append((u, weight))
         self.nodes.add(u)
         self.nodes.add(v)
-    
+
     def load_topology(self, filename):
-        """Cargar topología desde archivo"""
+        """Carga la topología de la red desde un archivo de texto."""
         with open(filename, "r", encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
@@ -34,9 +30,9 @@ class Network:
                 u, v, w = parts[0], parts[1], int(parts[2])
                 self.add_connection(u, v, w)
         print(f"Topología cargada: {len(self.nodes)} nodos, {self.count_edges()} conexiones")
-    
+
     def create_default_topology(self):
-        """Crear topología por defecto para pruebas"""
+        """Crea una topología de red por defecto para pruebas rápidas."""
         connections = [
             ("Estacion1", "Estacion2", 10),
             ("Estacion1", "Estacion3", 15),
@@ -49,21 +45,21 @@ class Network:
         ]
         for u, v, w in connections:
             self.add_connection(u, v, w)
-    
+
     def count_edges(self):
-        """Contar número total de aristas"""
+        """Cuenta el número total de conexiones (aristas) en la red."""
         edges = set()
         for node in self.graph:
             for neighbor, _ in self.graph[node]:
                 edge = tuple(sorted([node, neighbor]))
                 edges.add(edge)
         return len(edges)
-    
+
     def simulate_node_failure(self, failed_node):
-        """Simular falla de un nodo"""
+        """Simula la falla de un nodo, devolviendo un grafo temporal sin ese nodo."""
         if failed_node in self.nodes:
             print(f"⚠️  FALLA SIMULADA: Nodo {failed_node} fuera de servicio")
-            # Crear grafo temporal sin el nodo fallido
+            # Crea un grafo temporal excluyendo el nodo fallido
             temp_graph = defaultdict(list)
             for node in self.graph:
                 if node != failed_node:
@@ -72,20 +68,24 @@ class Network:
                             temp_graph[node].append((neighbor, weight))
             return temp_graph
         return self.graph
-    
+
     def update_traffic_stats(self, node):
-        """Actualizar estadísticas de tráfico"""
+        """Actualiza el contador de tráfico para un nodo (por ejemplo, cuando pasa una emergencia)."""
         self.stats[node] += 1
-    
+
     def get_network_stats(self):
-        """Obtener estadísticas de la red"""
+        """Devuelve estadísticas generales de la red."""
         return {
             'total_nodes': len(self.nodes),
             'total_connections': self.count_edges(),
             'traffic_per_node': dict(self.stats)
         }
-    
+
     def visualize(self, output_file="network_graph", exclude_nodes=None):
+        """
+        Visualiza la red usando Graphviz.
+        Si se pasan nodos a excluir, estos no se muestran en el gráfico.
+        """
         import graphviz
         import shutil
 
@@ -101,7 +101,7 @@ class Network:
         for node in self.nodes:
             if node in exclude_nodes:
                 continue
-            # Extraer número de estación
+            # Extrae el número de la estación para el nodo
             num = ''.join(filter(str.isdigit, node))
             dot.node(num, tooltip=node, fillcolor='#a8edea')
 
