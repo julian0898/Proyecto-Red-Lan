@@ -5,9 +5,8 @@ import shutil
 # Importar graphviz solo si está disponible
 try:
     import graphviz
-    GRAPHVIZ_AVAILABLE = True
 except ImportError:
-    GRAPHVIZ_AVAILABLE = False
+    graphviz = None
 
 class Network:
     def __init__(self):
@@ -22,21 +21,19 @@ class Network:
         self.nodes.add(u)
         self.nodes.add(v)
     
-    def load_topology(self, path):
+    def load_topology(self, filename):
         """Cargar topología desde archivo"""
-        try:
-            with open(path, 'r') as f:
-                for line in f:
-                    line = line.strip()
-                    if line and not line.startswith('#'):
-                        parts = line.split()
-                        if len(parts) >= 3:
-                            u, v, w = parts[0], parts[1], int(parts[2])
-                            self.add_connection(u, v, w)
-            print(f"Topología cargada: {len(self.nodes)} nodos, {self.count_edges()} conexiones")
-        except FileNotFoundError:
-            print(f"Archivo {path} no encontrado. Creando topología por defecto...")
-            self.create_default_topology()
+        with open(filename, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split()
+                if len(parts) != 3:
+                    continue  # Salta líneas mal formateadas
+                u, v, w = parts[0], parts[1], int(parts[2])
+                self.add_connection(u, v, w)
+        print(f"Topología cargada: {len(self.nodes)} nodos, {self.count_edges()} conexiones")
     
     def create_default_topology(self):
         """Crear topología por defecto para pruebas"""

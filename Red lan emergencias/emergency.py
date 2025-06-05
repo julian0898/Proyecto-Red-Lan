@@ -39,3 +39,11 @@ class EmergencyManager:
             "pending": pending
         }
 
+emergency_manager = EmergencyManager()
+failed_node = "Node 42"
+severity = "Alta"
+emergency_type = "Fallo Crítico"
+description = "El nodo 42 ha dejado de funcionar y necesita atención inmediata."
+
+emergency = emergency_manager.add_emergency(failed_node, severity, emergency_type, description)
+
