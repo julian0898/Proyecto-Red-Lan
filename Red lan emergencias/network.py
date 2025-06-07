@@ -8,17 +8,17 @@ class Network:
         # Inicializa el grafo, el conjunto de nodos y las estadísticas de tráfico
         self.graph = defaultdict(list)
         self.nodes = set()
-        self.stats = defaultdict(int)  # Para estadísticas de tráfico
+        self.stats = defaultdict(int)  
 
     def add_connection(self, u, v, weight):
-        """Agrega una conexión bidireccional entre los nodos u y v con peso 'weight'."""
+        
         self.graph[u].append((v, weight))
         self.graph[v].append((u, weight))
         self.nodes.add(u)
         self.nodes.add(v)
 
     def load_topology(self, filename):
-        """Carga la topología de la red desde un archivo de texto."""
+        
         with open(filename, "r", encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
@@ -32,7 +32,7 @@ class Network:
         print(f"Topología cargada: {len(self.nodes)} nodos, {self.count_edges()} conexiones")
 
     def create_default_topology(self):
-        """Crea una topología de red por defecto para pruebas rápidas."""
+        
         connections = [
             ("Estacion1", "Estacion2", 10),
             ("Estacion1", "Estacion3", 15),
@@ -47,7 +47,7 @@ class Network:
             self.add_connection(u, v, w)
 
     def count_edges(self):
-        """Cuenta el número total de conexiones (aristas) en la red."""
+        
         edges = set()
         for node in self.graph:
             for neighbor, _ in self.graph[node]:
@@ -56,10 +56,10 @@ class Network:
         return len(edges)
 
     def simulate_node_failure(self, failed_node):
-        """Simula la falla de un nodo, devolviendo un grafo temporal sin ese nodo."""
+        
         if failed_node in self.nodes:
             print(f"⚠️  FALLA SIMULADA: Nodo {failed_node} fuera de servicio")
-            # Crea un grafo temporal excluyendo el nodo fallido
+           
             temp_graph = defaultdict(list)
             for node in self.graph:
                 if node != failed_node:
@@ -70,11 +70,11 @@ class Network:
         return self.graph
 
     def update_traffic_stats(self, node):
-        """Actualiza el contador de tráfico para un nodo (por ejemplo, cuando pasa una emergencia)."""
+        
         self.stats[node] += 1
 
     def get_network_stats(self):
-        """Devuelve estadísticas generales de la red."""
+       
         return {
             'total_nodes': len(self.nodes),
             'total_connections': self.count_edges(),
@@ -82,10 +82,7 @@ class Network:
         }
 
     def visualize(self, output_file="network_graph", exclude_nodes=None):
-        """
-        Visualiza la red usando Graphviz.
-        Si se pasan nodos a excluir, estos no se muestran en el gráfico.
-        """
+       
         import graphviz
         import shutil
 

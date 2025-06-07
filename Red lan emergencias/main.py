@@ -1,6 +1,4 @@
-# main.py
 
-# --- Importaciones de librerías y módulos propios ---
 import os
 import tkinter as tk
 from tkinter import simpledialog, messagebox
@@ -32,37 +30,35 @@ recursos_disponibles = {
 # Lista de estaciones de la red
 estaciones = ["Estacion1", "Estacion2", "Estacion3", "Estacion4", "Estacion5", "Estacion6"]
 
-# --- Función principal para ejecutar la interfaz gráfica ---
 def run_gui():
-    # --- Inicialización de objetos principales ---
-    network = Network()  # Red de estaciones y conexiones
-    emergency_manager = EmergencyManager()  # Gestor de emergencias
-    simulator = EmergencySimulator()  # Simulador de asignación de recursos
-    nodos_fuera = set()  # Conjunto de nodos fuera de servicio
+    
+    network = Network()  
+    emergency_manager = EmergencyManager()  
+    simulator = EmergencySimulator()  
+    nodos_fuera = set()  
 
-    # --- Cargar la topología de la red desde archivo ---
     network.load_topology("topology.txt")
 
-    # --- Configuración de la ventana principal de Tkinter ---
+    # Configuración de la ventana principal de Tkinter
     root = tk.Tk()
     root.title("Simulador de Red LAN para Emergencias")
     root.geometry("400x500")
     root.configure(bg="#f8f9fa")
 
-    # --- Definición de fuentes para la interfaz ---
+    #Definición de fuentes para la interfaz
     title_font = font.Font(family="Segoe UI", size=18, weight="bold")
     subtitle_font = font.Font(family="Segoe UI", size=10, slant="italic")
     button_font = font.Font(family="Segoe UI", size=11, weight="normal")
 
-    # --- Títulos principales ---
+    # Títulos principales
     tk.Label(root, text="Simulador de Red LAN para Emergencias", bg="#f9f9fa", fg="#222f3e", font=title_font).pack(pady=(18, 2))
     tk.Label(root, text="Gestión y simulación de emergencias en red", bg="#f9f9fa", fg="#576574", font=subtitle_font).pack(pady=(0, 10))
 
-    # --- Frame para los botones principales ---
+    # Frame para los botones principales
     frame = tk.Frame(root, bg="#f9f9fa")
     frame.pack(expand=True)
 
-    # --- Función para asignar el recurso más cercano a una emergencia ---
+    # Función para asignar el recurso más cercano a una emergencia
     def asignar_recurso_mas_cercano(emergency_location, resource_type):
         min_dist = float('inf')
         mejor_recurso = None
@@ -75,7 +71,7 @@ def run_gui():
                 mejor_recurso = recurso
         return mejor_recurso, min_dist
 
-    # --- Función para encontrar la estación más cercana a una ubicación ---
+    # Función para encontrar la estación más cercana a una ubicación
     def estacion_mas_cercana(ubicacion_emergencia, excluir=None):
         min_dist = float('inf')
         estacion_cercana = None
@@ -90,41 +86,41 @@ def run_gui():
                 estacion_cercana = estacion
         return estacion_cercana, min_dist
 
-    # --- Función para mostrar la asignación de recursos a una emergencia ---
+    # Función para mostrar la asignación de recursos a una emergencia
     def mostrar_asignacion(asignacion, emergency_type):
         if not isinstance(asignacion, dict) or "assignments" not in asignacion or not asignacion["assignments"]:
             messagebox.showinfo("Ayuda enviada", "No se pudo asignar ayuda a esta emergencia.")
             return
 
         tipo_entidad = {
-            "incendio": "🚒 Bomberos",
-            "accidente": "🚑 Ambulancia y 🚓 Policía",
-            "robo": "🚓 Policía",
-            "inundacion": "🚒 Bomberos y 🚑 Ambulancia",
-            "explosion": "🚒 Bomberos, 🚑 Ambulancia y 🚓 Policía",
-            "emergencia_medica": "🚑 Ambulancia",
-            "disturbio": "🚓 Policía",
-            "desastre_natural": "🧑‍🚒 Rescate, 🚒 Bomberos, 🚑 Ambulancia, 🚓 Policía",
-            "accidente_transito": "🚑 Ambulancia y 🚓 Policía",
-            "violencia": "🚓 Policía",
-            "salud_publica": "👩‍⚕️ Salud y 🚑 Ambulancia",
-            "medio_ambiente": "🌱 Ambiental y 🚒 Bomberos"
+            "incendio": " Bomberos",
+            "accidente": " Ambulancia y  Policía",
+            "robo": " Policía",
+            "inundacion": " Bomberos y  Ambulancia",
+            "explosion": " Bomberos,  Ambulancia y  Policía",
+            "emergencia_medica": " Ambulancia",
+            "disturbio": " Policía",
+            "desastre_natural": " Rescate,  Bomberos,  Ambulancia,  Policía",
+            "accidente_transito": " Ambulancia y  Policía",
+            "violencia": " Policía",
+            "salud_publica": " Salud y  Ambulancia",
+            "medio_ambiente": " Ambiental y  Bomberos"
         }
         entidades = []
         for recurso, datos in asignacion["assignments"].items():
             nombre = {
-                "bomberos": "🚒 Bomberos",
-                "ambulancia": "🚑 Ambulancia",
-                "policia": "🚓 Policía",
-                "rescate": "🧑‍🚒 Rescate",
-                "salud": "👩‍⚕️ Salud",
-                "ambiental": "🌱 Ambiental"
+                "bomberos": " Bomberos",
+                "ambulancia": " Ambulancia",
+                "policia": " Policía",
+                "rescate": " Rescate",
+                "salud": " Salud",
+                "ambiental": " Ambiental"
             }.get(recurso, recurso.capitalize())
             entidades.append(f"• {nombre}  |  ETA: {datos['eta']} min  |  ID: {datos['resource_id']}")
         entidades_str = "\n".join(entidades)
         mensaje = (
-            f"🆘 Tipo de emergencia: {tipo_entidad.get(emergency_type, emergency_type.capitalize())}\n\n"
-            f"👮‍♂️👩‍🚒👩‍⚕️ **Ayuda enviada:**\n{entidades_str}"
+            f" Tipo de emergencia: {tipo_entidad.get(emergency_type, emergency_type.capitalize())}\n\n"
+            f" **Ayuda enviada:**\n{entidades_str}"
         )
         messagebox.showinfo("Ayuda enviada", mensaje)
 
@@ -149,7 +145,7 @@ def run_gui():
                 edge = tuple(sorted([node, neighbor]))
                 if edge in added_edges:
                     continue
-                # Si la arista está en el camino más corto, resáltala
+                
                 if node in path and neighbor in path:
                     idx1 = path.index(node)
                     idx2 = path.index(neighbor)
@@ -176,11 +172,11 @@ def run_gui():
         todos_nodos = set(network.nodes) | {nodo_ficticio}
         for node in todos_nodos:
             if node == nodo_ficticio:
-                color = "#ee5253"  # Rojo para el punto ficticio
+                color = "#ee5253"  
             elif node in path:
-                color = "#feca57"  # Amarillo para la ruta
+                color = "#feca57"  
             else:
-                color = "#a8edea"  # Azul claro para el resto
+                color = "#a8edea"  
             dot.node(node, tooltip=node, fillcolor=color)
 
         # Añadir aristas de la red
@@ -205,7 +201,7 @@ def run_gui():
             dot.edge(path[-2], path[-1], color="#ee5253", penwidth='4', style='dashed')
         dot.render("ruta_mas_corta", view=True)
 
-    # --- FUNCIÓN CENTRAL PARA GESTIONAR EMERGENCIAS EN CUALQUIER PUNTO ---
+    # FUNCIÓN CENTRAL PARA GESTIONAR EMERGENCIAS EN CUALQUIER PUNTO
     def gestionar_emergencia_en_punto(location, severity, emergency_type, description):
         estacion, distancia = estacion_mas_cercana(location)
         if not estacion:
@@ -217,7 +213,7 @@ def run_gui():
 
         # Notificar a todas las estaciones
         for n in network.nodes:
-            noti = f"🔔 Emergencia de tipo {emergency_type} en {location}. Estación más cercana: {estacion} (distancia: {distancia})"
+            noti = f" Emergencia de tipo {emergency_type} en {location}. Estación más cercana: {estacion} (distancia: {distancia})"
             if noti not in notificaciones_globales:
                 notificaciones_globales.append(noti)
 
@@ -238,14 +234,14 @@ def run_gui():
             visualizar_ruta_grafica(path)
 
     def ver_topologia():
-        info = f"📡 Nodos: {len(network.nodes)}\n🔗 Conexiones: {network.count_edges()}\n\n"
+        info = f" Nodos: {len(network.nodes)}\n Conexiones: {network.count_edges()}\n\n"
         for node in sorted(network.graph.keys()):
             connections = [(neighbor, weight) for neighbor, weight in network.graph[node]]
             info += f"• {node}:\n"
             for n, w in connections:
                 info += f"    ↳ {n}  (peso: {w})\n"
         if nodos_fuera:
-            info += f"\n🚫 Nodos fuera de servicio: {', '.join(sorted(nodos_fuera))}"
+            info += f"\n Nodos fuera de servicio: {', '.join(sorted(nodos_fuera))}"
         messagebox.showinfo("Topología de Red", info)
 
     def reportar_emergencia_estacion():
@@ -318,14 +314,14 @@ def run_gui():
         emergency.assigned_resources = [datos['resource_id'] for datos in asignacion["assignments"].values()] if isinstance(asignacion, dict) and "assignments" in asignacion else []
         emergency.attended = False
 
-        # --- SACAR EL NODO DE SERVICIO ---
+        # SACAR EL NODO DE SERVICIO
         if ubicacion in network.nodes:
             nodos_fuera.add(ubicacion)
             network.simulate_node_failure(ubicacion)
 
         estaciones_afectadas = sorted(network.nodes - nodos_fuera - {ubicacion})
         noti = (
-            f"🔔 Emergencia de tipo {tipo} en {ubicacion}. "
+            f" Emergencia de tipo {tipo} en {ubicacion}. "
             f"Estación más cercana: {emergency.assigned_station} (distancia: {distancia})"
         )
         if noti not in notificaciones_globales:
@@ -340,12 +336,12 @@ def run_gui():
         ayuda_str = "\n".join(ayuda) if ayuda else "No se pudo asignar ayuda."
 
         mensaje = (
-            f"🆘 Emergencia en: {ubicacion}\n"
+            f" Emergencia en: {ubicacion}\n"
             f"Tipo: {tipo}\n"
             f"Gravedad: {gravedad}\n\n"
-            f"🚨 Estación más cercana: {emergency.assigned_station} (distancia: {distancia})\n"
-            f"🏢 Otras estaciones notificadas: {', '.join(estaciones_afectadas) if estaciones_afectadas else 'Ninguna'}\n\n"
-            f"👮‍♂️👩‍🚒👩‍⚕️ Ayuda enviada:\n{ayuda_str}"
+            f" Estación más cercana: {emergency.assigned_station} (distancia: {distancia})\n"
+            f" Otras estaciones notificadas: {', '.join(estaciones_afectadas) if estaciones_afectadas else 'Ninguna'}\n\n"
+            f" Ayuda enviada:\n{ayuda_str}"
         )
         messagebox.showinfo("Emergencia registrada", mensaje)
 
@@ -420,7 +416,7 @@ def run_gui():
         # Otras estaciones notificadas
         estaciones_afectadas = sorted(set(estaciones) - {estacion_cercana})
 
-        # --- REGISTRAR LA EMERGENCIA SIMULADA EN EL MANAGER ---
+        # REGISTRAR LA EMERGENCIA SIMULADA EN EL MANAGER
         emergencia_simulada = emergency_manager.add_emergency(lugar, gravedad, tipo, descripcion)
         emergencia_simulada.simulada = True
         emergencia_simulada.assigned_station = estacion_cercana
@@ -430,7 +426,7 @@ def run_gui():
         # Notificar a todas las estaciones
         for n in estaciones:
             noti = (
-                f"🔔 Emergencia simulada de tipo {tipo} en {lugar}. "
+                f" Emergencia simulada de tipo {tipo} en {lugar}. "
                 f"Estación más cercana: {estacion_cercana} (distancia: {distancia})"
             )
             if noti not in notificaciones_globales:
@@ -438,23 +434,23 @@ def run_gui():
 
         if mejor_path and distancia != float('inf'):
             mensaje = (
-                f"🆘 Emergencia simulada en: {lugar}\n"
+                f" Emergencia simulada en: {lugar}\n"
                 f"Tipo: {tipo}\n"
                 f"Gravedad: {gravedad}\n\n"
-                f"🚨 Estación respondiendo: {estacion_cercana}\n"
-                f"🛣️ Ruta más corta: {' → '.join(mejor_path)}\n"
-                f"⏱️ Tiempo estimado de llegada: {int(distancia)} minuto{'s' if int(distancia) != 1 else ''}\n"
-                f"🏢 Otras estaciones notificadas: {', '.join(estaciones_afectadas) if estaciones_afectadas else 'Ninguna'}\n\n"
-                f"👮‍♂️👩‍🚒👩‍⚕️ Ayuda enviada:\n{ayuda_str}"
+                f" Estación respondiendo: {estacion_cercana}\n"
+                f" Ruta más corta: {' → '.join(mejor_path)}\n"
+                f" Tiempo estimado de llegada: {int(distancia)} minuto{'s' if int(distancia) != 1 else ''}\n"
+                f" Otras estaciones notificadas: {', '.join(estaciones_afectadas) if estaciones_afectadas else 'Ninguna'}\n\n"
+                f" Ayuda enviada:\n{ayuda_str}"
             )
         else:
             mensaje = (
-                f"🆘 Emergencia simulada en: {lugar}\n"
+                f" Emergencia simulada en: {lugar}\n"
                 f"Tipo: {tipo}\n"
                 f"Gravedad: {gravedad}\n\n"
-                f"🚨 No hay ruta disponible desde ninguna estación operativa.\n"
-                f"🏢 Otras estaciones notificadas: {', '.join(estaciones_afectadas) if estaciones_afectadas else 'Ninguna'}\n"
-                f"👮‍♂️👩‍🚒👩‍⚕️ No se pudo asignar ayuda."
+                f" No hay ruta disponible desde ninguna estación operativa.\n"
+                f" Otras estaciones notificadas: {', '.join(estaciones_afectadas) if estaciones_afectadas else 'Ninguna'}\n"
+                f" No se pudo asignar ayuda."
             )
 
         messagebox.showinfo(
@@ -474,13 +470,13 @@ def run_gui():
             {"tipo": "terremoto", "prob": 0.4}
         ]
         evento = random.choices(eventos, weights=[e["prob"] for e in eventos])[0]
-        estaciones_propensas = random.sample(estaciones, k=2)  # Ejemplo: 2 estaciones propensas
+        estaciones_propensas = random.sample(estaciones, k=2)  
         estacion_afectada = random.choice(estaciones_propensas)
         gravedad = random.randint(5, 10)
         dias_prediccion = random.randint(1, 7)
         descripcion = f"Pronóstico IA: {evento['tipo']} con alta probabilidad en {', '.join(estaciones_propensas)}"
 
-        # Estaciones que podrían ayudar (todas operativas menos la afectada)
+        # Estaciones que podrían ayudar (todas operativas menos la afectada
         estaciones_ayuda = [e for e in estaciones if e != estacion_afectada and e not in nodos_fuera]
 
         messagebox.showinfo(
@@ -508,13 +504,13 @@ def run_gui():
         net_stats = network.get_network_stats()
         estaciones_fuera = sorted(nodos_fuera & set(estaciones))
         info = (
-            f"📊 **Estadísticas Generales**\n\n"
-            f"🚨 Emergencias: {em_stats.get('total', 0)} total\n"
-            f"🕒 Pendientes: {em_stats.get('pending', 0)}\n"
-            f"✅ Atendidas: {em_stats.get('attended', 0)}\n"
-            f"🌐 Nodos en red: {net_stats.get('total_nodes', 0)}\n"
-            f"🔗 Conexiones: {net_stats.get('total_connections', 0)}\n"
-            f"🚫 Estaciones fuera de servicio: {len(estaciones_fuera)}\n"
+            f" **Estadísticas Generales**\n\n"
+            f" Emergencias: {em_stats.get('total', 0)} total\n"
+            f" Pendientes: {em_stats.get('pending', 0)}\n"
+            f" Atendidas: {em_stats.get('attended', 0)}\n"
+            f" Nodos en red: {net_stats.get('total_nodes', 0)}\n"
+            f" Conexiones: {net_stats.get('total_connections', 0)}\n"
+            f" Estaciones fuera de servicio: {len(estaciones_fuera)}\n"
             f"{'• ' + ', '.join(estaciones_fuera) if estaciones_fuera else ''}"
         )
 
@@ -563,7 +559,7 @@ def run_gui():
             network.simulate_node_failure(failed_node)
             for n in network.nodes:
                 if n != failed_node:
-                    noti = f"🔔 Notificación: La estación {failed_node} ha sido desactivada por falla."
+                    noti = f" Notificación: La estación {failed_node} ha sido desactivada por falla."
                     if noti not in notificaciones_globales:
                         notificaciones_globales.append(noti)
             estaciones_afectadas = sorted(set(estaciones) & set(network.nodes) - nodos_fuera - {failed_node})
@@ -642,7 +638,7 @@ def run_gui():
         description = simpledialog.askstring("Descripción", "Descripción (opcional):") or ""
         emergency = emergency_manager.add_emergency(nodo, severity, emergency_type, description)
         asignacion = simulator.assign_resources(emergency)
-        # Asignar a la estación más cercana (no a sí misma)
+        
         emergency.assigned_station, _ = estacion_mas_cercana(nodo, excluir=nodo)
         emergency.assigned_resources = [datos['resource_id'] for datos in asignacion["assignments"].values()] if isinstance(asignacion, dict) and "assignments" in asignacion else []
         emergency.attended = False
@@ -654,7 +650,7 @@ def run_gui():
         messagebox.showinfo("Aviso", f"¡Atención! La estación '{nodo}' ha fallado por emergencia.\n"
                                      f"Estaciones notificadas: {', '.join(estaciones_afectadas)}")
 
-        # --- REASIGNAR EMERGENCIAS PENDIENTES ---
+        # REASIGNAR EMERGENCIAS PENDIENTES
         pendientes = [
             e for e in emergency_manager.emergencies
             if not getattr(e, "attended", False) and getattr(e, "assigned_station", None) == nodo
@@ -666,7 +662,7 @@ def run_gui():
                 anterior = emergencia.assigned_station
                 emergencia.assigned_station = nueva_estacion
                 noti = (
-                    f"🔔 Emergencia en {emergencia.location} ha sido reasignada a {nueva_estacion} "
+                    f"Emergencia en {emergencia.location} ha sido reasignada a {nueva_estacion} "
                     f"por falla de {nodo}."
                 )
                 if noti not in notificaciones_globales:
@@ -676,7 +672,7 @@ def run_gui():
                     f"   reasignada de {anterior} a {nueva_estacion}."
                 )
             else:
-                emergencia.assigned_station = None  # No hay estación disponible
+                emergencia.assigned_station = None  
                 reasignaciones.append(
                     f"• Emergencia en {emergencia.location} (tipo: {getattr(emergencia, 'emergency_type', getattr(emergencia, 'type', '?'))}, gravedad: {getattr(emergencia, 'severity', '?')})\n"
                     f"   no pudo ser reasignada (no hay estaciones disponibles)."
@@ -690,7 +686,7 @@ def run_gui():
             else:
                 messagebox.showinfo("Asignación óptima", f"No hay {emergency_type} disponibles.")
 
-    # --- FUNCIÓN PARA INGRESAR A UNA ESTACIÓN ---
+    #FUNCIÓN PARA INGRESAR A UNA ESTACIÓN
     def ingresar_estacion():
         nodos = sorted(set(estaciones) & set(network.nodes))
         if not nodos:
@@ -717,7 +713,7 @@ def run_gui():
                 for n, w in connections:
                     info += f"    ↳ {n}  (peso: {w})\n"
             if nodos_fuera:
-                info += f"\n🚫 Nodos fuera de servicio: {', '.join(sorted(nodos_fuera))}"
+                info += f"\n Nodos fuera de servicio: {', '.join(sorted(nodos_fuera))}"
             messagebox.showinfo("Topología de Red", info)
 
         def ver_ruta_corta():
@@ -753,9 +749,9 @@ def run_gui():
                     network.load_topology("topology.txt")
                     for nf in nodos_fuera:
                         network.simulate_node_failure(nf)
-                messagebox.showinfo("Atendida", f"✅ La emergencia en {emergencia_activa.location} ha sido atendida y la estación ha sido reconectada.")
+                messagebox.showinfo("Atendida", f"La emergencia en {emergencia_activa.location} ha sido atendida y la estación ha sido reconectada.")
             else:
-                messagebox.showinfo("Atendida", f"✅ No hay emergencia activa asignada a esta estación.\nLa estación está operativa.")
+                messagebox.showinfo("Atendida", f" No hay emergencia activa asignada a esta estación.\nLa estación está operativa.")
 
         def ver_notificaciones():
             if not notificaciones_globales:
@@ -787,7 +783,7 @@ def run_gui():
                     def marcar_atendida_local(em=e, fr=frame_em):
                         em.attended = True
                         emergency_manager.attend_emergency(em)
-                        messagebox.showinfo("Atendida", f"✅ La emergencia en {em.location} ha sido marcada como atendida.")
+                        messagebox.showinfo("Atendida", f"La emergencia en {em.location} ha sido marcada como atendida.")
                         fr.destroy()
                     tk.Button(frame_em, text="Atendida", command=marcar_atendida_local, bg="#00b894", fg="white", font=("Segoe UI", 10, "bold"), width=10).pack(side="right")
                 tk.Button(ventana, text="Cerrar", command=ventana.destroy, bg="#e9ecef", fg="#222f3e", font=button_font, width=20).pack(pady=10)
@@ -795,42 +791,42 @@ def run_gui():
                 messagebox.showinfo("Emergencias pendientes", "No hay emergencias pendientes asignadas a esta estación.")
 
         # Botones del menú de estación
-        tk.Button(est_win, text="👁️ Visualizar topología de red", width=32, command=ver_topologia_estacion, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=6)
-        tk.Button(est_win, text="🧭 Ruta más corta a otra estación", width=32, command=ver_ruta_corta, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=6)
-        tk.Button(est_win, text="➕ Agregar emergencia manual", width=32, command=reportar_emergencia_estacion, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=6)
-        tk.Button(est_win, text="✅ Marcar emergencia como atendida", width=32, command=marcar_atendida, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=6)
-        tk.Button(est_win, text="🔔 Ver notificaciones", width=32, command=ver_notificaciones, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=6)
-        tk.Button(est_win, text="📋 Ver emergencias pendientes", width=32, command=ver_emergencias_pendientes, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=6)
-        tk.Button(est_win, text="⬅️ Volver al menú principal", width=32, command=est_win.destroy, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=12)
+        tk.Button(est_win, text=" Visualizar topología de red", width=32, command=ver_topologia_estacion, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=6)
+        tk.Button(est_win, text=" Ruta más corta a otra estación", width=32, command=ver_ruta_corta, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=6)
+        tk.Button(est_win, text=" Agregar emergencia manual", width=32, command=reportar_emergencia_estacion, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=6)
+        tk.Button(est_win, text=" Marcar emergencia como atendida", width=32, command=marcar_atendida, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=6)
+        tk.Button(est_win, text=" Ver notificaciones", width=32, command=ver_notificaciones, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=6)
+        tk.Button(est_win, text=" Ver emergencias pendientes", width=32, command=ver_emergencias_pendientes, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=6)
+        tk.Button(est_win, text="⬅ Volver al menú principal", width=32, command=est_win.destroy, bg="#e9ecef", fg="#222f3e", font=button_font).pack(pady=12)
 
-    # --- Función para salir de la aplicación ---
+   
     def salir():
         root.destroy()
 
-    # --- Definición de los botones del menú principal y sus acciones ---
+    
     botones = [
-        ("🔎 Ver topología de red", ver_topologia),  # Muestra la topología de la red
-        ("⚡ Simulación automática", simular_automatica),  # Simula una emergencia aleatoria
-        ("📊 Estadísticas", mostrar_estadisticas),  # Muestra estadísticas generales y detalles
-        ("❌ Simular falla de nodo", simular_falla),  # Simula la falla de una estación
-        ("🔄 Restaurar estación", restaurar_estacion),  # Permite restaurar estaciones fuera de servicio
-        ("🧭 Calcular ruta", calcular_ruta),  # Calcula la ruta más corta entre dos nodos
-        ("🌐 Visualizar red", visualizar_red),  # Visualiza la red completa (usando Graphviz)
-        ("➕ reportar emergencia", reportar_emergencia_estacion),  # Permite reportar una emergencia manualmente
-        ("🏢 Ingresar a una estación", ingresar_estacion),  # Menú de gestión para una estación específica
-        ("🤖 Pronóstico IA de emergencias", pronostico_ia),  # Simula un pronóstico de IA para emergencias
-        ("⏹️ Salir", salir)  # Cierra la aplicación
+        (" Ver topología de red", ver_topologia),  
+        (" Simulación automática", simular_automatica),  
+        (" Estadísticas", mostrar_estadisticas),  
+        (" Simular falla de nodo", simular_falla),  
+        (" Restaurar estación", restaurar_estacion),  
+        (" Calcular ruta", calcular_ruta),  
+        (" Visualizar red", visualizar_red),  
+        (" reportar emergencia", reportar_emergencia_estacion),  
+        (" Ingresar a una estación", ingresar_estacion),  
+        (" Pronóstico IA de emergencias", pronostico_ia), 
+        ("Salir", salir)  
     ]
 
-    # --- Creación de los botones en la interfaz principal ---
+    # Creación de los botones en la interfaz principal
     for texto, comando in botones:
         tk.Button(
             frame, text=texto, width=30, height=1, command=comando,
             bg="#e9ecef", fg="#222f3e", font=button_font, relief="groove", bd=2, activebackground="#dee2e6"
         ).pack(pady=4)
 
-    # --- Bucle principal de la aplicación ---
+    
     root.mainloop()
 
-# --- Llamada para iniciar la aplicación ---
+
 run_gui()
